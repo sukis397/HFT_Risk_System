@@ -1,5 +1,5 @@
 # HFT_Risk_System
-## Ejecución en GitHub Codespace llamado super-duper twink
+## Ejecución en GitHub Codespace llamado ubiquitous space meme
 
 Este proyecto combina tres módulos: un kernel en C++ (Monte Carlo con OpenMP), un pipeline en Python (currificación y evaluación perezosa) y una capa de integración en Java (POO, patrón Observer y cálculo del VaR).
 
