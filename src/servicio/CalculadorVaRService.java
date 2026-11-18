@@ -7,7 +7,7 @@ import modelo.PosicionRiesgo;
 import patrones.observer.AlertaRiesgo;
 
 public class CalculadorVaRService {
-        // Debe coincidir con S0 en main.cpp: el kernel simula desde este precio
+    // Debe coincidir con S0 en main.cpp: el kernel simula desde este precio
     private static final double S0_KERNEL = 100.0;
     private final AlertaRiesgo gestorAlertas;
 
@@ -22,15 +22,20 @@ public class CalculadorVaRService {
         System.out.println("[INFO] Simulando " + posicion.activo().getTicker()
                 + " con kernel C++ y pipeline Python...");
 
+        // Nombres de ejecutable según el sistema operativo
+        boolean esWindows = System.getProperty("os.name").toLowerCase().contains("win");
+        String kernel = esWindows ? "kernel_montecarlo.exe" : "./kernel_montecarlo.exe";
+        String python = esWindows ? "python" : "python3";
+
         // 1) Módulo imperativo C++: genera los precios finales (una línea por trayectoria)
-        List<String> precios = ejecutar(new ProcessBuilder("kernel_montecarlo.exe"), null);
+        List<String> precios = ejecutar(new ProcessBuilder(kernel), null);
 
         // 2) Módulo funcional Python: recibe los precios por stdin, devuelve el percentil 5%
-        List<String> salidaPy = ejecutar(new ProcessBuilder("python", "Pipeline/pipeline_riesgo.py"), precios);
+        List<String> salidaPy = ejecutar(new ProcessBuilder(python, "Pipeline/pipeline_riesgo.py"), precios);
         double percentil5 = Double.parseDouble(salidaPy.get(0));
 
-        // 3) Módulo POO: VaR 95% = pérdida respecto al precio inicial
-                double s0 = S0_KERNEL;
+        // 3) Módulo POO: VaR 95% = pérdida respecto al precio inicial del kernel
+        double s0 = S0_KERNEL;
         return (s0 - percentil5) * posicion.cantidadContratos();
     }
 
